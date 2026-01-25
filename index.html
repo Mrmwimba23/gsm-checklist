@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GSM Knowledge Base & Checklist</title>
+<style>
+    body {font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f5f5f5; color: #333;}
+    header {background: #004aad; color: white; padding: 1rem; text-align: center;}
+    .container {max-width: 900px; margin: 2rem auto; padding: 1rem; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 10px;}
+    h2 {color: #004aad; cursor: pointer;}
+    input[type="text"] {width: 100%; padding: 0.5rem; margin-bottom: 1rem; border-radius: 5px; border: 1px solid #ccc;}
+    .query {margin-bottom: 1rem; padding: 1rem; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;}
+    ul.checklist {list-style-type: none; padding-left: 0; margin-top: 0.5rem; display: none;}
+    ul.checklist li {margin: 0.5rem 0;}
+    ul.checklist li label {display: flex; align-items: center; cursor: pointer;}
+    ul.checklist li input[type="checkbox"] {margin-right: 0.5rem;}
+    .hidden {display: none;}
+    .print-button, .download-button {
+        background: #004aad; color: white; border: none; padding: 0.5rem 1rem;
+        border-radius: 5px; cursor: pointer; margin-right: 0.5rem;
+    }
+    .print-button:hover, .download-button:hover {background: #003080;}
+</style>
+</head>
+<body>
+
+<header>
+    <h1>GSM Knowledge Base & Checklist</h1>
+</header>
+
+<div class="container">
+    <input type="text" id="searchInput" placeholder="Search for a query...">
+    <button class="print-button" onclick="window.print()">Print Checklist</button>
+    <button class="download-button" onclick="downloadCSV()">Download CSV Report</button>
+
+    <div id="knowledgeBase">
+
+        <div class="query" data-query="pin reset">
+            <h2>PIN Reset</h2>
+            <p>Steps to resolve a PIN reset request.</p>
+            <ul class="checklist">
+                <li><label><input type="checkbox"> Verify user identity</label></li>
+                <li><label><input type="checkbox"> Check account active in system</label></li>
+                <li><label><input type="checkbox"> Reset PIN in system</label></li>
+                <li><label><input type="checkbox"> Confirm reset with partner</label></li>
+                <li><label><input type="checkbox"> Update tracker</label></li>
+            </ul>
+        </div>
+
+        <div class="query" data-query="sim verification">
+            <h2>SIM Verification</h2>
+            <p>Steps to verify a SIM card.</p>
+            <ul class="checklist">
+                <li><label><input type="checkbox"> Confirm SIM serial number</label></li>
+                <li><label><input type="checkbox"> Check registration details</label></li>
+                <li><label><input type="checkbox"> Verify activation</label></li>
+                <li><label><input type="checkbox"> Notify partner/store</label></li>
+                <li><label><input type="checkbox"> Update tracker</label></li>
+            </ul>
+        </div>
+
+        <div class="query" data-query="change of details">
+            <h2>Change of Details</h2>
+            <p>Steps to process Change of Details requests.</p>
+            <ul class="checklist">
+                <li><label><input type="checkbox"> Verify identity</label></li>
+                <li><label><input type="checkbox"> Check existing details</label></li>
+                <li><label><input type="checkbox"> Update details</label></li>
+                <li><label><input type="checkbox"> Confirm changes</label></li>
+                <li><label><input type="checkbox"> Escalate if needed</label></li>
+            </ul>
+        </div>
+
+        <div class="query" data-query="general">
+            <h2>General Queries</h2>
+            <p>Other common partner/store queries.</p>
+            <ul class="checklist">
+                <li><label><input type="checkbox"> Assess query type</label></li>
+                <li><label><input type="checkbox"> Check previous tickets</label></li>
+                <li><label><input type="checkbox"> Provide resolution/escalate</label></li>
+                <li><label><input type="checkbox"> Record actions</label></li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+
+<script>
+document.getElementById('searchInput').addEventListener('input', function() {
+    const filter = this.value.toLowerCase();
+    document.querySelectorAll('.query').forEach(q => {
+        q.classList.toggle('hidden', !q.dataset.query.includes(filter));
+    });
+});
+
+document.querySelectorAll('.query h2').forEach(h => {
+    h.addEventListener('click', () => {
+        const ul = h.nextElementSibling.nextElementSibling;
+        ul.style.display = ul.style.display === 'block' ? 'none' : 'block';
+    });
+});
+
+function downloadCSV() {
+    const rows = [];
+    document.querySelectorAll('.query').forEach(query => {
+        const name = query.querySelector('h2').innerText;
+        query.querySelectorAll('.checklist li').forEach(li => {
+            const step = li.textContent.trim();
+            const done = li.querySelector('input').checked;
+            rows.push([name, step, done]);
+        });
+    });
+    let csv = "data:text/csv;charset=utf-8,Query,Step,Done\n";
+    rows.forEach(r => {
+        csv += r.map(c => `"${c}"`).join(",") + "\n";
+    });
+    const link = document.createElement("a");
+    link.href = encodeURI(csv);
+    link.download = "gsm_checklist_report.csv";
+    link.click();
+}
+</script>
+
+</body>
+</html>
