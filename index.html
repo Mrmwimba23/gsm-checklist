@@ -1,342 +1,43 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>GSM Knowledge Base & Checklist — MTN Y'ello Theme</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23ffd200'/%3E%3C/svg%3E" />
-<style>
-    :root{
-        --yello: #ffd200;
-        --yello-dark:#f0c300;
-        --navy:#002b5c;
-        --bg:#fff8e6;
-        --muted:#6b6b6b;
-        --card-shadow: 0 6px 18px rgba(0,0,0,0.08);
-        --radius:12px;
-    }
-    *{box-sizing:border-box}
-    body{
-        margin:0;
-        font-family:Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
-        background: linear-gradient(180deg, #fff 0%, #fff9ec 50%, #fff8e6 100%);
-        color:#17233b;
-        -webkit-font-smoothing:antialiased;
-        -moz-osx-font-smoothing:grayscale;
-    }
-    header{
-        background:linear-gradient(90deg,var(--yello) 0%, #fff 100%);
-        padding:1.25rem;
-        display:flex;
-        align-items:center;
-        gap:1rem;
-        border-bottom:4px solid var(--yello-dark);
-    }
-    header .logo{
-        width:56px;height:56px;border-radius:12px;background:var(--navy);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:1.1rem;box-shadow:var(--card-shadow)
-    }
-    header h1{margin:0;font-size:1.25rem;color:var(--navy)}
-    .container{max-width:980px;margin:1.25rem auto;padding:1.25rem;background:linear-gradient(180deg,#ffffff,#fffef8);box-shadow:var(--card-shadow);border-radius:var(--radius)}
-    .top-actions{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem}
-    .search-wrap{flex:1;min-width:220px;display:flex;gap:.5rem}
-    input[type="text"], .select {
-        width:100%;padding:.6rem .75rem;border-radius:10px;border:1px solid #e6d89a;background:transparent;outline:none;
-        box-shadow:inset 0 1px 0 rgba(255,255,255,0.6);
-    }
-    .btn{
-        background:var(--navy);color:white;border:none;padding:.55rem .7rem;border-radius:10px;cursor:pointer;font-weight:600;
-    }
-    .btn.secondary{background:transparent;color:var(--navy);border:1px solid rgba(0,43,92,0.08)}
-    .btn.warning{background:var(--yello);color:var(--navy)}
-    .controls{display:flex;gap:.5rem;align-items:center}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem}
-    .query{background:linear-gradient(180deg,#fff,#fffdf2);padding:1rem;border-radius:10px;border:1px solid rgba(0,0,0,0.04)}
-    .query h2{color:var(--navy);margin:0;font-size:1.05rem;display:flex;justify-content:space-between;align-items:center;gap:.5rem;cursor:pointer}
-    .query p{color:var(--muted);margin:.5rem 0 .75rem;font-size:.95rem}
-    ul.checklist{list-style:none;padding:0;margin:0;display:none;max-height:360px;overflow:auto;border-top:1px dashed rgba(0,0,0,0.03);padding-top:.75rem}
-    ul.checklist li{padding:.35rem 0;display:flex;align-items:center;gap:.5rem}
-    ul.checklist li label{cursor:pointer;flex:1;display:flex;align-items:center;gap:.6rem}
-    ul.checklist li input[type="checkbox"]{width:18px;height:18px;accent-color:var(--navy)}
-    .meta{display:flex;gap:.5rem;align-items:center;font-size:.85rem;color:var(--muted)}
-    .highlight{background:transparent;border-left:4px solid var(--yello);padding-left:.5rem}
-    .footer{margin-top:1rem;padding-top:1rem;border-top:1px solid rgba(0,0,0,0.04);display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap}
-    .small{font-size:.85rem;color:var(--muted)}
-    .copyright{font-size:.9rem;color:#333}
-    /* utilities */
-    .controls .small{font-size:.85rem}
-    .action-row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-bottom:.75rem}
-    /* responsive */
-    @media (max-width:640px){
-        header{padding:.9rem}
-        .container{margin:.75rem;padding:.9rem}
-        header h1{font-size:1rem}
-    }
-</style>
-</head>
-<body>
-
-<header>
-    <div class="logo">MTN</div>
-    <div>
-        <h1>GSM Knowledge Base & Checklist</h1>
-        <div class="small" style="margin-top:4px">Y'ello themed quick ops for partners & stores</div>
-    </div>
-</header>
-
-<div class="container">
-    <div class="top-actions">
-        <div class="search-wrap">
-            <input type="text" id="searchInput" placeholder="Search queries or steps (press / to focus)">
-            <div class="controls">
-                <button class="btn" id="expandAll">Expand All</button>
-                <button class="btn secondary" id="collapseAll">Collapse All</button>
-            </div>
-        </div>
-
-        <div style="display:flex;gap:.5rem;align-items:center">
-            <button class="btn warning" id="markAllVisible">Mark Visible</button>
-            <button class="btn secondary" id="clearAll">Clear Visible</button>
-            <button class="btn" id="downloadCSV">Download CSV</button>
-            <button class="btn secondary" id="downloadJSON">Download JSON</button>
-        </div>
-    </div>
-
-    <div class="action-row">
-        <div class="meta">Visible queries: <span id="visibleCount">0</span></div>
-        <div class="meta">Completed: <span id="completedCount">0</span></div>
-    </div>
-
-    <div id="knowledgeBase" class="grid">
-
-        <div class="query" data-query="pin reset">
-            <h2>PIN Reset <button class="btn secondary toggle-btn" aria-label="toggle">Toggle</button></h2>
-            <p>Steps to resolve a PIN reset request.</p>
-            <ul class="checklist" aria-hidden="true">
-                <li><label><input type="checkbox"> Verify user identity</label></li>
-                <li><label><input type="checkbox"> Check account active in system</label></li>
-                <li><label><input type="checkbox"> Reset PIN in system</label></li>
-                <li><label><input type="checkbox"> Confirm reset with partner</label></li>
-                <li><label><input type="checkbox"> Update tracker</label></li>
-            </ul>
-        </div>
-
-        <div class="query" data-query="sim verification">
-            <h2>SIM Verification <button class="btn secondary toggle-btn" aria-label="toggle">Toggle</button></h2>
-            <p>Steps to verify a SIM card.</p>
-            <ul class="checklist" aria-hidden="true">
-                <li><label><input type="checkbox"> Confirm SIM serial number</label></li>
-                <li><label><input type="checkbox"> Check registration details</label></li>
-                <li><label><input type="checkbox"> Verify activation</label></li>
-                <li><label><input type="checkbox"> Notify partner/store</label></li>
-                <li><label><input type="checkbox"> Update tracker</label></li>
-            </ul>
-        </div>
-
-        <div class="query" data-query="change of details">
-            <h2>Change of Details <button class="btn secondary toggle-btn" aria-label="toggle">Toggle</button></h2>
-            <p>Steps to process Change of Details requests.</p>
-            <ul class="checklist" aria-hidden="true">
-                <li><label><input type="checkbox"> Verify identity</label></li>
-                <li><label><input type="checkbox"> Check existing details</label></li>
-                <li><label><input type="checkbox"> Update details</label></li>
-                <li><label><input type="checkbox"> Confirm changes</label></li>
-                <li><label><input type="checkbox"> Escalate if needed</label></li>
-            </ul>
-        </div>
-
-        <div class="query" data-query="general">
-            <h2>General Queries <button class="btn secondary toggle-btn" aria-label="toggle">Toggle</button></h2>
-            <p>Other common partner/store queries.</p>
-            <ul class="checklist" aria-hidden="true">
-                <li><label><input type="checkbox"> Assess query type</label></li>
-                <li><label><input type="checkbox"> Check previous tickets</label></li>
-                <li><label><input type="checkbox"> Provide resolution/escalate</label></li>
-                <li><label><input type="checkbox"> Record actions</label></li>
-            </ul>
-        </div>
-
-    </div>
-
-    <div class="footer">
-        <div class="small">Tip: Press '/' to focus search. Use keyboard to toggle items (Enter) and navigate.</div>
-        <div class="copyright">© 2026 I create shit</div>
-    </div>
-</div>
-
-<script>
-/* Utilities & state persistence */
-const KB = document.getElementById('knowledgeBase');
-const searchInput = document.getElementById('searchInput');
-const visibleCountEl = document.getElementById('visibleCount');
-const completedCountEl = document.getElementById('completedCount');
-
-function saveState(){
-    const data = [];
-    document.querySelectorAll('.query').forEach(q=>{
-        const name = q.querySelector('h2').innerText.trim();
-        const steps = [];
-        q.querySelectorAll('.checklist li').forEach((li,i)=>{
-            steps.push({text:li.textContent.trim(), done: li.querySelector('input').checked});
-        });
-        const open = q.querySelector('.checklist').style.display === 'block';
-        data.push({name, steps, open});
-    });
-    localStorage.setItem('gsm_kb_state', JSON.stringify(data));
-}
-function loadState(){
-    const raw = localStorage.getItem('gsm_kb_state');
-    if(!raw) return;
-    try{
-        const data = JSON.parse(raw);
-        data.forEach(entry=>{
-            const q = Array.from(document.querySelectorAll('.query')).find(x => x.querySelector('h2').innerText.trim() === entry.name);
-            if(!q) return;
-            entry.steps.forEach((s,i)=>{
-                const li = q.querySelectorAll('.checklist li')[i];
-                if(li) li.querySelector('input').checked = !!s.done;
-            });
-            const ul = q.querySelector('.checklist');
-            ul.style.display = entry.open ? 'block' : 'none';
-            ul.setAttribute('aria-hidden', !entry.open);
-        });
-    }catch(e){console.warn('Failed to parse state', e)}
-}
-function updateCounts(){
-    const visible = Array.from(document.querySelectorAll('.query')).filter(q => !q.classList.contains('hidden')).length;
-    let completed = 0, total = 0;
-    document.querySelectorAll('.checklist li').forEach(li=>{ total++; if(li.querySelector('input').checked) completed++; });
-    visibleCountEl.innerText = visible;
-    completedCountEl.innerText = `${completed}/${total}`;
-}
-function highlightMatch(el, term){
-    const text = el.querySelector('h2').innerText + ' ' + el.querySelector('p').innerText + ' ' + Array.from(el.querySelectorAll('.checklist li')).map(li=>li.textContent).join(' ');
-    const matched = text.toLowerCase().includes(term.toLowerCase());
-    el.classList.toggle('hidden', !matched);
-    if(term && matched){
-        el.classList.add('highlight');
-    } else {
-        el.classList.remove('highlight');
-    }
-}
-
-/* Search */
-searchInput.addEventListener('input', (e)=>{
-    const v = e.target.value.trim().toLowerCase();
-    document.querySelectorAll('.query').forEach(q => highlightMatch(q, v));
-    updateCounts();
-});
-
-/* Keyboard shortcut for search */
-document.addEventListener('keydown', (e)=>{
-    if(e.key === '/') { e.preventDefault(); searchInput.focus(); searchInput.select(); }
-});
-
-/* Toggle per query */
-document.querySelectorAll('.query h2').forEach(h=>{
-    h.addEventListener('click', (ev)=>{
-        // ignore clicks on inner buttons
-        if(ev.target.tagName.toLowerCase() === 'button') return;
-        const ul = h.parentElement.querySelector('.checklist');
-        const open = ul.style.display === 'block';
-        ul.style.display = open ? 'none' : 'block';
-        ul.setAttribute('aria-hidden', open ? 'true' : 'false');
-        saveState();
-    });
-});
-
-/* toggle buttons */
-document.querySelectorAll('.toggle-btn').forEach(btn=>{
-    btn.addEventListener('click', (e)=>{
-        const q = btn.closest('.query');
-        const ul = q.querySelector('.checklist');
-        const open = ul.style.display === 'block';
-        ul.style.display = open ? 'none' : 'block';
-        ul.setAttribute('aria-hidden', open ? 'true' : 'false');
-        saveState();
-    });
-});
-
-/* checkbox change */
-document.addEventListener('change', (e)=>{
-    if(e.target && e.target.type === 'checkbox') { saveState(); updateCounts(); }
-});
-
-/* Expand/collapse all */
-document.getElementById('expandAll').addEventListener('click', ()=>{
-    document.querySelectorAll('.checklist').forEach(ul=>{ ul.style.display='block'; ul.setAttribute('aria-hidden','false'); });
-    saveState(); updateCounts();
-});
-document.getElementById('collapseAll').addEventListener('click', ()=>{
-    document.querySelectorAll('.checklist').forEach(ul=>{ ul.style.display='none'; ul.setAttribute('aria-hidden','true'); });
-    saveState(); updateCounts();
-});
-
-/* Mark/Clear visible */
-document.getElementById('markAllVisible').addEventListener('click', ()=>{
-    document.querySelectorAll('.query').forEach(q=>{
-        if(!q.classList.contains('hidden')) q.querySelectorAll('.checklist li input').forEach(cb=>cb.checked=true);
-    });
-    saveState(); updateCounts();
-});
-document.getElementById('clearAll').addEventListener('click', ()=>{
-    document.querySelectorAll('.query').forEach(q=>{
-        if(!q.classList.contains('hidden')) q.querySelectorAll('.checklist li input').forEach(cb=>cb.checked=false);
-    });
-    saveState(); updateCounts();
-});
-
-/* Export CSV/JSON */
-function collectRows(){
-    const rows = [];
-    document.querySelectorAll('.query').forEach(query=>{
-        const name = query.querySelector('h2').innerText.trim();
-        query.querySelectorAll('.checklist li').forEach(li=>{
-            const step = li.textContent.trim();
-            const done = li.querySelector('input').checked;
-            rows.push({query:name, step, done});
-        });
-    });
-    return rows;
-}
-document.getElementById('downloadCSV').addEventListener('click', ()=>{
-    const rows = collectRows();
-    let csv = "Query,Step,Done\n";
-    rows.forEach(r => { csv += `"${r.query.replace(/"/g,'""')}","${r.step.replace(/"/g,'""')}",${r.done}\n`; });
-    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'gsm_checklist_report.csv'; a.click(); URL.revokeObjectURL(url);
-});
-document.getElementById('downloadJSON').addEventListener('click', ()=>{
-    const data = collectRows();
-    const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'gsm_checklist_report.json'; a.click(); URL.revokeObjectURL(url);
-});
-
-/* Initialize keyboard navigation: Enter toggles focused query */
-document.addEventListener('keydown', (e)=>{
-    if(e.key === 'Enter' && document.activeElement && document.activeElement.closest && document.activeElement.closest('.query')){
-        const q = document.activeElement.closest('.query');
-        const ul = q.querySelector('.checklist');
-        const open = ul.style.display === 'block';
-        ul.style.display = open ? 'none' : 'block';
-        ul.setAttribute('aria-hidden', open ? 'true' : 'false');
-        saveState(); updateCounts();
-    }
-});
-
-/* Focus management: make queries focusable */
-document.querySelectorAll('.query').forEach(q=>{
-    q.setAttribute('tabindex','0');
-});
-
-/* Initial load */
-loadState();
-updateCounts();
-
-/* Save periodically in case of frequent changes */
-setInterval(saveState, 5000);
-
-</script>
-</body>
-</html>
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+<meta charset="utf-8"/>  
+<meta name="viewport" content="width=device-width,initial-scale=1"/>  
+<title>GSM Knowledge Base & Checklist — MTN Y'ello</title>  
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23ffd200'/%3E%3C/svg%3E" />  
+<style>  
+:root{  
+  --yello:#ffd200; --yello-dark:#f0c300; --navy:#002b5c; --muted:#6b6b6b;  
+  --card-radius:12px;  
+}  
+*{box-sizing:border-box}  
+body{  
+  margin:0;font-family:Inter, Roboto, "Helvetica Neue", Arial, sans-serif;  
+  background: #fff8e6; color:#17233b;  
+}  
+header{  
+  background:linear-gradient(90deg,var(--yello) 0%, #fff 100%);  
+  padding:1rem; display:flex; gap:1rem; align-items:center; border-bottom:4px solid var(--yello-dark);  
+}  
+.logo{width:56px;height:56px;border-radius:10px;background:var(--navy);display:flex;align-items:center;justify-content:center;color:white;font-weight:700}  
+.header-right{display:flex;flex-direction:column}  
+.header-nav{margin-top:6px;font-size:.95rem}  
+.header-nav a{margin-right:12px;color:var(--navy);text-decoration:none;font-weight:600}  
+.container{max-width:980px;margin:1.25rem auto;padding:1.25rem;background:linear-gradient(180deg,#fff,#fffef8);box-shadow:0 8px 24px rgba(0,0,0,0.06);border-radius:var(--card-radius)}  
+.top-actions{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem}  
+.search-wrap{flex:1;min-width:220px;display:flex;gap:.5rem}  
+input[type="text"]{width:100%;padding:.6rem .75rem;border-radius:10px;border:1px solid #e6d89a;background:transparent}  
+.btn{background:var(--navy);color:white;border:none;padding:.55rem .7rem;border-radius:10px;cursor:pointer;font-weight:600}  
+.btn.secondary{background:transparent;color:var(--navy);border:1px solid rgba(0,43,92,0.08)}  
+.btn.warning{background:var(--yello);color:var(--navy)}  
+.action-row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-bottom:.75rem}  
+.meta{font-size:.9rem;color:var(--muted)}  
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem}  
+.query{background:linear-gradient(180deg,#fff,#fffdf2);padding:1rem;border-radius:10px;border:1px solid rgba(0,0,0,0.04)}  
+.query h2{color:var(--navy);margin:0;font-size:1.05rem;display:flex;justify-content:space-between;align-items:center;gap:.5rem;cursor:pointer}  
+.query p{color:var(--muted);margin:.5rem 0 .75rem}  
+ul.checklist{list-style:none;padding:0;margin:0;display:none;max-height:360px;overflow:auto;border-top:1px dashed rgba(0,0,0,0.03);padding-top:.75rem}  
+ul.checklist li{padding:.35rem 0;display:flex;align-items:center;gap:.5rem}  
+ul.checklist li input[type=checkbox]{width:18px;height:18px;accent-color:var(--navy)}  
+.hidden{display:none !important}  
+.highlight{border-left:
